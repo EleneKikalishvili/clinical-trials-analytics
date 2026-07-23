@@ -1,0 +1,6 @@
+data/raw/
+__pycache__/
+.ipynb_checkpoints/
+.env
+venv/
+*.pbix

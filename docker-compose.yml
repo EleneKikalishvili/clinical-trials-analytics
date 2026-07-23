@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:17
+    container_name: clinical_trials_db
+    environment:
+      POSTGRES_USER: ctuser
+      POSTGRES_PASSWORD: ctpass
+      POSTGRES_DB: clinical_trials
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
