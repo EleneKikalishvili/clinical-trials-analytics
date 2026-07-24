@@ -174,9 +174,18 @@ def build_studies(df):
 
     # Dates: source is string, target is DATE.
     # errors="coerce" turns unparseable values into NaT rather than raising.
-    studies["start_date"] = pd.to_datetime(df["Start Date"], errors="coerce")
-    studies["completion_date"] = pd.to_datetime(df["Completion Date"], errors="coerce")
-    studies["primary_completion_date"] = pd.to_datetime(df["Primary Completion Date"], errors="coerce")
+    # format="mixed" parses each value independently. Without it, pandas infers
+    # a single format from the leading rows and coerces anything that doesn't
+    # match to NaT - which silently nulled 1,511 valid dates.
+    studies["start_date"] = pd.to_datetime(
+        df["Start Date"], format="mixed", errors="coerce"
+    )
+    studies["completion_date"] = pd.to_datetime(
+        df["Completion Date"], format="mixed", errors="coerce"
+    )
+    studies["primary_completion_date"] = pd.to_datetime(
+        df["Primary Completion Date"], format="mixed", errors="coerce"
+    )
 
     # Enrollment: source is float, target is INTEGER.
     studies["enrollment"] = df["Enrollment"].astype("Int64")
