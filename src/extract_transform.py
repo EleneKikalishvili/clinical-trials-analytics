@@ -167,7 +167,9 @@ def build_studies(df):
     studies["acronym"] = df["Acronym"]
     studies["status"] = df["Status"]
     studies["phase"] = df["Phases"]
-    studies["study_type"] = df["Study Type"]
+    # Expanded Access studies append subtype detail after a colon
+    # which exceeds the schema's VARCHAR(50) for 7 records. The base type is retained;
+    studies["study_type"] = df["Study Type"].str.split(":").str[0].str.strip()
     studies["gender"] = df["Gender"]
 
     # Dates: source is string, target is DATE.
@@ -337,6 +339,12 @@ def build_locations(df, studies):
     locations["country"] = parsed.str[3]
 
     locations["continent"] = None
+
+    # Two sites contain free text in the facility field, causing the parse to
+    # shift and produce city values exceeding the schema's VARCHAR(100).
+    # Truncated rather than nulled, so the misparse remains visible to profiling.
+    for col, limit in [("facility", 255), ("city", 100), ("state", 100), ("country", 100)]:
+        locations[col] = locations[col].str.slice(0, limit)
 
     return locations[LOCATIONS_COLUMNS].reset_index(drop=True)
 
